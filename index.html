@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEROVEX - BARTZ STORE</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+    :root{
+        --neon:#00e5ff;
+        --neon-pink:#ff00ff;
+        --bg:#050a14;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box;}
+
+    body{
+        background:#050a14;
+        color:#fff;
+        font-family:'Share Tech Mono',monospace;
+        min-height:100vh;
+        overflow-x:hidden;
+        position:relative;
+    }
+
+    /* BACKGROUND GRID ANIMASI */
+ .bg-grid{
+        position:fixed;
+        top:0;left:0;
+        width:100%;height:100%;
+        background-image:
+            linear-gradient(rgba(0,229,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,229,255,0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        z-index:-2;
+    }
+    @keyframes gridMove{
+        0%{transform:translate(0,0);}
+        100%{transform:translate(50px,50px);}
+    }
+
+    /* PARTIKEL NEON */
+ .particles{
+        position:fixed;
+        top:0;left:0;
+        width:100%;height:100%;
+        z-index:-1;
+        overflow:hidden;
+    }
+ .particle{
+        position:absolute;
+        width:3px;height:3px;
+        background:#00e5ff;
+        border-radius:50%;
+        box-shadow:0 0 10px #00e5ff, 0 0 20px #00e5ff;
+        animation: floatUp linear infinite;
+    }
+    @keyframes floatUp{
+        0%{transform:translateY(100vh) translateX(0);opacity:0;}
+        10%{opacity:1;}
+        90%{opacity:1;}
+        100%{transform:translateY(-100vh) translateX(100px);opacity:0;}
+    }
+
+    /* LOADING SCREEN */
+ .loading-screen{
+        position:fixed;
+        top:0;left:0;
+        width:100%;height:100%;
+        background:#050a14;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        z-index:9999;
+        animation: fadeOut 0.8s ease 2.5s forwards;
+    }
+    @keyframes fadeOut{
+        to{opacity:0;visibility:hidden;}
+    }
+
+ .loading-text{
+        font-family:'Orbitron',sans-serif;
+        font-size:1.8rem;
+        font-weight:900;
+        background:linear-gradient(90deg,#00e5ff,#fff,#ff00ff,#00e5ff);
+        background-size:200% auto;
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        background-clip:text;
+        animation: gradientSlide 2s linear infinite;
+        letter-spacing:3px;
+        text-align:center;
+        text-shadow:0 0 30px rgba(0,229,255,0.5);
+    }
+    @keyframes gradientSlide{
+        to{background-position:200% center;}
+    }
+
+ .loading-bar{
+        width:250px;
+        height:4px;
+        background:rgba(0,229,255,0.2);
+        border-radius:10px;
+        margin-top:20px;
+        overflow:hidden;
+        position:relative;
+        box-shadow:0 0 20px rgba(0,229,255,0.3);
+    }
+ .loading-bar::before{
+        content:'';
+        position:absolute;
+        height:100%;
+        width:0%;
+        background:linear-gradient(90deg,#00e5ff,#ff00ff);
+        animation: loadingProgress 2.5s ease forwards;
+        box-shadow:0 0 20px #00e5ff;
+    }
+    @keyframes loadingProgress{
+        to{width:100%;}
+    }
+
+ .loading-sub{
+        margin-top:15px;
+        font-size:0.85rem;
+        color:#00e5ff;
+        opacity:0.7;
+        animation: blink 1.5s infinite;
+    }
+    @keyframes blink{
+        0%,100%{opacity:0.7;}
+        50%{opacity:0.2;}
+    }
+
+    /* MAIN CONTENT */
+ .container{
+        max-width:650px;
+        margin:0 auto;
+        padding:16px;
+        opacity:0;
+        animation: fadeInContent 1s ease 2.6s forwards;
+    }
+    @keyframes fadeInContent{
+        to{opacity:1;}
+    }
+
+ .banner{
+        background: linear-gradient(135deg, rgba(0,229,255,0.15) 0%, rgba(255,0,255,0.15) 100%);
+        border:2px solid transparent;
+        border-radius:16px;
+        padding:25px;
+        text-align:center;
+        margin-bottom:25px;
+        position:relative;
+        overflow:hidden;
+        backdrop-filter: blur(10px);
+    }
+ .banner::before{
+        content:'';
+        position:absolute;
+        top:-2px;left:-2px;right:-2px;bottom:-2px;
+        background:linear-gradient(45deg,#00e5ff,#ff00ff,#00e5ff);
+        border-radius:16px;
+        z-index:-1;
+        animation: borderRotate 3s linear infinite;
+    }
+    @keyframes borderRotate{
+        0%{filter:hue-rotate(0deg);}
+        100%{filter:hue-rotate(360deg);}
+    }
+ .banner h2{
+        font-family:'Orbitron',sans-serif;
+        font-weight:900;
+        font-size:1.4rem;
+        background:linear-gradient(90deg,#00e5ff,#fff,#ff00ff);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        background-clip:text;
+        margin-bottom:8px;
+    }
+ .banner h3{font-family:'Orbitron',sans-serif;color:#fff;margin-bottom:5px;}
+
+ .section{
+        margin:30px 0 15px 0;
+        font-size:1rem;
+        color:#00e5ff;
+        font-family:'Orbitron',sans-serif;
+        font-weight:700;
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+ .section::after{
+        content:'';
+        flex:1;
+        height:1px;
+        background:linear-gradient(90deg,#00e5ff,transparent);
+    }
+
+ .paket{
+        background:rgba(255,255,255,0.05);
+        border:1px solid rgba(0,229,255,0.3);
+        border-radius:14px;
+        padding:16px;
+        margin-bottom:12px;
+        cursor:pointer;
+        transition:all 0.3s ease;
+        backdrop-filter: blur(10px);
+        position:relative;
+        overflow:hidden;
+    }
+ .paket::before{
+        content:'';
+        position:absolute;
+        top:0;left:-100%;
+        width:100%;height:100%;
+        background:linear-gradient(90deg,transparent,rgba(0,229,255,0.2),transparent);
+        transition:0.5s;
+    }
+ .paket:hover::before{left:100%;}
+ .paket:hover{
+        transform:translateY(-5px);
+        border-color:#00e5ff;
+        box-shadow:0 10px 30px rgba(0,229,255,0.4);
+        background:rgba(255,255,255,0.1);
+    }
+
+ .paket-header{display:flex;justify-content:space-between;align-items:center}
+ .paket-name{
+        font-size:1.15rem;
+        font-weight:700;
+        text-transform:uppercase;
+        color:#fff;
+        font-family:'Orbitron',sans-serif;
+    }
+ .paket-price{
+        font-size:1.2rem;
+        color:#00ffff;
+        font-weight:900;
+        text-shadow:0 0 15px #00ffff, 0 0 30px #00ffff;
+    }
+
+ .benefit-box{
+        background:linear-gradient(135deg,rgba(0,229,255,0.08) 0%,rgba(255,0,255,0.08) 100%);
+        border:1px solid rgba(0,229,255,0.3);
+        border-radius:14px;
+        padding:18px;
+        margin-bottom:15px;
+        backdrop-filter: blur(10px);
+    }
+ .benefit-box ul{list-style:none;}
+ .benefit-box li{
+        margin:10px 0;
+        padding-left:5px;
+        transition:0.2s;
+    }
+ .benefit-box li:hover{
+        color:#00ffff;
+        transform:translateX(5px);
+    }
+
+ .contact-box{
+        background:linear-gradient(135deg,rgba(0,229,255,0.1) 0%,rgba(255,0,255,0.1) 100%);
+        border:2px solid #00e5ff;
+        border-radius:16px;
+        padding:20px;
+        margin-top:30px;
+        text-align:center;
+        backdrop-filter: blur(10px);
+    }
+ .contact-num{
+        font-size:1.3rem;
+        font-weight:700;
+        letter-spacing:2px;
+        color:#00ffff;
+        text-shadow:0 0 15px #00ffff;
+    }
+
+ .btn{
+        display:block;
+        width:100%;
+        padding:15px;
+        border-radius:50px;
+        text-align:center;
+        font-weight:700;
+        text-decoration:none;
+        background:transparent;
+        border:2px solid #00e5ff;
+        color:#00e5ff;
+        transition:all 0.3s;
+        margin-top:12px;
+        cursor:pointer;
+        font-family:'Orbitron',sans-serif;
+        text-transform:uppercase;
+        letter-spacing:1px;
+    }
+ .btn:hover{
+        background:#00e5ff;
+        color:#050a14;
+        box-shadow:0 0 30px rgba(0,229,255,0.8);
+        transform:scale(1.02);
+    }
+ .btn-confirm{
+        background:linear-gradient(90deg,#00e5ff,#ff00ff);
+        color:#fff;
+        border:none;
+    }
+ .btn-confirm:hover{
+        background:linear-gradient(90deg,#ff00ff,#00e5ff);
+        box-shadow:0 0 40px rgba(255,0,255,0.8);
+    }
+
+ .popup{
+        position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(5,10,20,0.98);
+        backdrop-filter: blur(8px);
+        display:none;align-items:center;justify-content:center;
+        z-index:999;
+    }
+ .popup.active{display:flex;}
+ .popup-box{
+        background:linear-gradient(135deg,#0a1a2a 0%,#1a0a2a 100%);
+        border:2px solid #00e5ff;
+        border-radius:20px;
+        padding:25px;
+        width:90%;max-width:400px;
+        text-align:center;
+        box-shadow:0 0 50px rgba(0,229,255,0.5);
+    }
+ .pay-num{
+        font-size:1.4rem;
+        font-weight:700;
+        color:#00ffff;
+        letter-spacing:2px;
+        margin:15px 0;
+        text-shadow:0 0 20px #00ffff;
+    }
+
+ .footer{
+        text-align:center;
+        margin-top:30px;
+        font-size:0.8rem;
+        opacity:0.6;
+        color:#888;
+    }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen">
+    <div class="loading-text">BARTZ AKSES KEY</div>
+    <div class="loading-bar"></div>
+    <div class="loading-sub">Initializing System...</div>
+</div>
+
+<!-- Popup Pembayaran -->
+<div class="popup" id="popup">
+    <div class="popup-box">
+        <h3 style="font-family:'Orbitron',sans-serif;">💳 METODE PEMBAYARAN</h3>
+        <p>Transfer ke nomor:</p>
+        <div class="pay-num">0882 8678 1324</div>
+        <p style="color:#888;">DANA / OVO / GOPAY</p>
+        <p style="font-size:0.85rem;margin-top:15px;color:#4dd0e1;">Paket yang dipilih:</p>
+        <p id="selected-paket" style="font-weight:bold;font-size:1.1rem;color:#fff;"></p>
+
+        <button class="btn btn-confirm" onclick="confirmPayment()">KONFIRMASI PEMBAYARAN</button>
+        <button class="btn" onclick="qrisRequest()">QRIS MINTA KE ADMIN</button>
+        <button class="btn" onclick="closePopup()">BATAL</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="banner">
+        <h2>乂 ⌜ SEL APK ZEROVEX 💥 ⌟ 乂</h2>
+        <h3>👑 BARTZ STORE 👑</h3>
+        <p>⚡ STABIL • ANTI RUNGKAD • FAST RESPON ⚡</p>
+    </div>
+
+    <div class="section">❏ PRICE LIST PROMO 🔥</div>
+
+    <div class="paket" onclick="selectPaket('MEMBER', 10000, '1 BULAN')">
+        <div class="paket-header">
+            <span class="paket-name">⭐ MEMBER</span>
+            <span class="paket-price">10K / 1 BULAN</span>
+        </div>
+    </div>
+    <div class="paket" onclick="selectPaket('MEMBER', 20000, 'PERMANEN')">
+        <div class="paket-header">
+            <span class="paket-name">⭐ MEMBER</span>
+            <span class="paket-price">20K / PERMANEN</span>
+        </div>
+    </div>
+
+    <div class="paket" onclick="selectPaket('VIP', 35000, 'PERMANEN')">
+        <div class="paket-header">
+            <span class="paket-name">👑 VIP</span>
+            <span class="paket-price">35K / PERMANEN</span>
+        </div>
+    </div>
+
+    <div class="paket" onclick="selectPaket('RESELLER', 45000, 'PERMANEN')">
+        <div class="paket-header">
+            <span class="paket-name">💎 RESELLER</span>
+            <span class="paket-price">45K / PERMANEN</span>
+        </div>
+    </div>
+
+    <div class="paket" onclick="selectPaket('ADMIN', 70000, 'PERMANEN')">
+        <div class="paket-header">
+            <span class="paket-name">👾 ADMIN</span>
+            <span class="paket-price">70K / PERMANEN</span>
+        </div>
+    </div>
+
+    <div class="paket" onclick="selectPaket('OWNER', 80000, 'PERMANEN')">
+        <div class="paket-header">
+            <span class="paket-name">🕵️‍♂️ OWNER</span>
+            <span class="paket-price">80K / PERMANEN</span>
+        </div>
+    </div>
+
+    <div class="section">❏ BENEFIT MEMBER & VIP 🎁</div>
+    <div class="benefit-box">
+        <ul>
+            <li>✅ Akses Bug</li>
+            <li>✅ Bug Sepuasnya</li>
+            <li>✅ Free Update [Permanen]</li>
+            <li>✅ Bisa Open Jasa Bug</li>
+        </ul>
+    </div>
+
+    <div class="section">❏ BENEFIT RESELLER 💎</div>
+    <div class="benefit-box">
+        <ul>
+            <li>🎁 Akses Jualan APK</li>
+            <li>🎁 Akses Semua Bug</li>
+            <li>🎁 Bisa Buka Member</li>
+            <li>🎁 Free Update Selamanya</li>
+        </ul>
+    </div>
+
+    <div class="section">❏ BENEFIT ADMIN/OWNER 👑</div>
+    <div class="benefit-box">
+        <ul>
+            <li>✅ Akses Full Panel</li>
+            <li>✅ Akses Jualan All Role</li>
+            <li>✅ Custom Brand Sendiri</li>
+            <li>✅ Prioritas Update</li>
+        </ul>
+    </div>
+
+    <div class="section">❏ CONTACT ORDER NOW ⚡</div>
+    <div class="contact-box">
+        <div>📱 WA : <span class="contact-num">0888 1942 059</span></div>
+        <div>✈️ TG : @bartzforyou</div>
+        <a href="https://wa.me/628881942059" class="btn">CHAT WHATSAPP SEKARANG</a>
+    </div>
+
+    <div class="footer">
+        <p>🔥 STOK TERBATAS! PROMO BERAKHIR SEWAKTU-WAKTU! 🔥</p>
+        <p>© Bartz Store 2026</p>
+    </div>
+</div>
+
+<script>
+// BACKGROUND PARTICLES
+const particlesContainer = document.getElementById('particles');
+for(let i=0; i<30; i++){
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random()*100 + '%';
+    particle.style.animationDuration = (8 + Math.random()*10) + 's';
+    particle.style.animationDelay = Math.random()*5 + 's';
+    particlesContainer.appendChild(particle);
+}
+
+// Popup Logic
+const popup = document.getElementById('popup');
+const selectedPaketEl = document.getElementById('selected-paket');
+let currentPaket = {name: '', price: 0, durasi: ''};
+
+function selectPaket(name, price, durasi){
+    currentPaket = {name, price, durasi};
+    selectedPaketEl.innerHTML = `${name} ${durasi} - Rp ${price.toLocaleString('id-ID')}`;
+    popup.classList.add('active');
+}
+
+function closePopup(){popup.classList.remove('active');}
+
+function confirmPayment(){
+    const msg = `Halo Admin Bartz,%0A%0ASAYA SUDAH BAYAR ✅%0A%0APaket: ${currentPaket.name} ${currentPaket.durasi}%0AHarga: Rp ${currentPaket.price.toLocaleString('id-ID')}%0ANo Tujuan: 088286781324%0A%0AMohon cek dan proses order saya.%0ATerima kasih!`;
+    window.location.href = `https://wa.me/628881942059?text=${msg}`;
+}
+
+function qrisRequest(){
+    const msg = `Halo Admin Bartz,%0ASaya mau minta QRIS untuk pembayaran paket ${currentPaket.name} ${currentPaket.durasi}.%0AMohon kirimkan QRIS nya. Terima kasih!`;
+    window.location.href = `https://wa.me/628881942059?text=${msg}`;
+}
+
+popup.addEventListener('click', (e)=>{if(e.target==popup) closePopup();});
+</script>
+</body>
+</html>
